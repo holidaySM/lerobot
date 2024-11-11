@@ -104,10 +104,7 @@ class Trainer:
                 weight_decay=self.cfg.ssl_weight_decay,
                 betas=tuple(self.cfg.betas),
             )
-            (
-                self.encoder,
-                self.encoder_optim,
-            ) = self.accelerator.prepare(self.encoder, self.encoder_optim)
+            self.encoder, self.encoder_optim = self.accelerator.prepare(self.encoder, self.encoder_optim)
             if self.accelerator.is_main_process:
                 self.wandb_run.watch(self.encoder)
 
@@ -123,10 +120,7 @@ class Trainer:
                     betas=tuple(self.cfg.betas),
                 )
             )
-            (
-                self.projector,
-                self.projector_optim,
-            ) = self.accelerator.prepare(self.projector, self.projector_optim)
+            self.projector, self.projector_optim = self.accelerator.prepare(self.projector, self.projector_optim)
 
     def _init_ssl(self):
         if self.ssl is None:
@@ -183,12 +177,7 @@ class Trainer:
             obs, _, _ = data
 
             with self.accelerator.autocast():
-                (
-                    obs_enc,
-                    obs_proj,
-                    ssl_loss,
-                    ssl_loss_components,
-                ) = self.ssl.forward(obs)
+                obs_enc, obs_proj, ssl_loss, ssl_loss_components  = self.ssl.forward(obs)
             self.log_append("ssl_train", len(obs), ssl_loss_components)
             self.accelerator.backward(ssl_loss, retain_graph=True)
 
