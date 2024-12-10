@@ -116,14 +116,16 @@ def get_hf_dataset_safe_version(repo_id: str, version: str) -> str:
         return version
 
 
-def load_hf_dataset(repo_id: str, version: str, root: Path, split: str) -> datasets.Dataset:
+def load_hf_dataset(
+    repo_id: str, version: str, root: Path, split: str
+) -> datasets.Dataset:
     """hf_dataset contains all the observations, states, actions, rewards, etc."""
     if root is not None:
         hf_dataset = load_from_disk(str(Path(root) / repo_id / "train"))
-        # TODO(rcadene): clean this which enables getting a subset of dataset
+        # Handle splitting based on indices
         if split != "train":
             if "%" in split:
-                raise NotImplementedError(f"We dont support splitting based on percentage for now ({split}).")
+                raise NotImplementedError(f"We don't support splitting based on percentage for now ({split}).")
             match_from = re.search(r"train\[(\d+):\]", split)
             match_to = re.search(r"train\[:(\d+)\]", split)
             if match_from:
