@@ -31,8 +31,8 @@ dataset_repo_id: lerobot/pusht
 video_backend: pyav
 
 training:
-  offline_steps: ???
-
+  offline_steps: 10000
+  split: train
   # Number of workers for the offline training dataloader.
   num_workers: 4
 
@@ -124,6 +124,7 @@ eval:
 
 wandb:
   enable: false
+  name: ""
   # Set to true to disable saving an artifact despite save_checkpoint == True
   disable_artifact: false
   project: lerobot
