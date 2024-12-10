@@ -14,7 +14,7 @@
 # ```
 
 seed: 1000
-dataset_repo_id: jhseon-holiday/xarm_holi_demos_lerobot
+dataset_repo_id: jhseon-holiday/xarm_holi_demos_lerobot_state_as_action
 
 override_dataset_stats:
   observation.image.cam_left:
