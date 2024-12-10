@@ -15,6 +15,7 @@ from lerobot.common.datasets.push_dataset_to_hub.utils import get_default_encodi
 from lerobot.common.datasets.rollout_datasets.episode_stores import EpisodeVideoStore, EpisodeVideoStoreAsHDF5
 from lerobot.common.policies.diffusion.modeling_diffusion import DiffusionPolicy
 from lerobot.common.policies.vqbet.modeling_vqbet import VQBeTPolicy
+from lerobot.common.utils.utils import init_hydra_config
 
 # After update gym-pushany, alter the object name list to gym_pushany.
 OBJECT_NAME_LIST = [
@@ -164,13 +165,18 @@ def rollout_for_ep_dicts(policy, env, device, episode_video_store, num_episodes)
     return episode_video_store
 
 
-def parse_pretrained_policy_path(pretrained_policy_path):
-    if pretrained_policy_path in ["lerobot/diffusion_pusht"]:
-        policy = DiffusionPolicy.from_pretrained(Path(snapshot_download(pretrained_policy_path)))
+def parse_pretrained_policy_path(pretrained_policy_path: str):
+    if pretrained_policy_path in ["lerobot/diffusion_pusht", "lerobot/vqbet_pusht"]:
+        pretrained_policy_path = snapshot_download(pretrained_policy_path)
+
+    pretrained_policy_path = Path(pretrained_policy_path)
+    hydra_cfg = init_hydra_config(str(pretrained_policy_path / "config.yaml"))
+    if hydra_cfg.policy.name == 'diffusion':
+        policy = DiffusionPolicy.from_pretrained(pretrained_policy_path)
         policy.diffusion.num_inference_steps = 10
         return policy
-    if pretrained_policy_path in ["lerobot/vqbet_pusht"]:
-        return VQBeTPolicy.from_pretrained(Path(snapshot_download(pretrained_policy_path)))
+    if hydra_cfg.policy.name == 'vqbet':
+        return VQBeTPolicy.from_pretrained(pretrained_policy_path)
     raise ValueError(f"Unknown pretrained policy path: {pretrained_policy_path}")
 
 
